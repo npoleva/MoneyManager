@@ -1,17 +1,6 @@
-# MoneyManager — Domain-Driven Design (DDD)
+# MoneyManager
 
 **MoneyManager** — приложение для управления личными финансами, построенное с использованием принципов DDD.
-
----
-
-## Цель
-
-Приложение отделяет бизнес-логику от инфраструктуры и презентации.
-
-Основные цели:
-- Чистая модель предметной области
-- Ясный Ubiquitous Language
-- Возможность масштабирования и тестирования
 
 ---
 
@@ -27,15 +16,75 @@
     - Сущности `Transaction`
     - Value Objects `Money` и `TransactionDescription`
 
-```text
-Wallet
-├─ Id : Guid
-├─ Name : string
-├─ InitialBalance : Money
-├─ Transactions : List<Transaction>
-├─ CurrentBalance : Money (вычисляемое)
-└─ Методы:
-    ├─ AddTransaction(Transaction)
-    ├─ GetTransactionsByMonthAndType(month, year, type)
-    ├─ GetTopExpenses(month, year)
-    └─ GetTransactionsGroupedByType(month, year)
+**Transaction (Транзакция)**
+
+- **Роль:** единица дохода или расхода, принадлежащая Wallet
+- **Содержит:**
+    - Amount (`Money`)
+    - Type (`Income`/`Expense`)
+    - Description (`TransactionDescription`)
+    - Date (дата транзакции)
+
+**Value Objects**
+
+- **Money:** сумма с валютой, поддерживает операции `+` и `-`, неизменяемый
+- **TransactionDescription:** описание транзакции, неизменяемый, не может быть пустым
+
+**Repository Interfaces**
+
+- **IWalletRepository**
+  - `GetById(Guid)` — получить кошелек по ID
+  - `GetAll()` — получить все кошельки
+  - `Save(Wallet)` — сохранить агрегат
+  - `AddTransaction(Transaction)` — сохранить транзакцию
+
+---
+
+## Application Layer
+
+**WalletAppService**
+
+- **Роль:** оркестрация бизнес-логики агрегатов и работа с DTO
+- **Что делает:**
+  - Создает кошелек (`CreateWallet`)
+  - Добавляет транзакцию (`AddTransaction`)
+  - Возвращает агрегаты и их данные в форме DTO
+  - Делегирует все бизнес-правила агрегату (например, проверку баланса)
+
+**DTO (Data Transfer Object)**
+
+- `WalletDto` — данные кошелька для слоя приложения/презентации
+- `TransactionDto` — данные транзакции
+
+---
+
+## Infrastructure Layer
+
+- **Роль:** конкретная реализация репозиториев, доступ к БД
+---
+
+## ConsoleApplication / Presentation Layer
+
+- **Роль:** интерфейс взаимодействия пользователя с приложением
+
+---
+
+## Ubiquitous Language (Словарь)
+
+| Термин                     | Значение                                                                 |
+|----------------------------|--------------------------------------------------------------------------|
+| Wallet (Кошелек)           | Агрегат, управляющий балансом и транзакциями                             |
+| Transaction (Транзакция)   | Сущность дохода или расхода                                             |
+| Income                      | Тип транзакции, добавляющий средства                                     |
+| Expense                     | Тип транзакции, уменьшающий баланс                                       |
+| Money                       | Value Object для суммы и валюты                                          |
+| TransactionDescription      | Value Object для описания транзакции                                     |
+| CurrentBalance              | Вычисляемый баланс кошелька                                             |
+
+---
+
+## Основные бизнес-правила (Domain Rules)
+
+1. Нельзя добавить расход больше, чем текущий баланс кошелька
+2. Транзакции всегда принадлежат кошельку
+3. Валюты транзакций должны совпадать с валютой кошелька
