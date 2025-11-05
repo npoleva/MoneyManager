@@ -6,11 +6,13 @@ public enum TransactionType { Income, Expense }
 
 public class Transaction
 {
-    public Guid Id { get; }
-    public DateTime Date { get; }
-    public Money Amount { get; }
-    public TransactionType Type { get; }
-    public TransactionDescription Description { get; }
+    public Guid Id { get; private set; } 
+    public Money Amount { get; private set; }
+    public TransactionType Type { get; private set; }
+    public TransactionDescription Description { get; private set; }
+    public DateTime Date { get; private set; }
+    
+    protected Transaction() { }
 
     public Transaction(Money amount, TransactionType type, TransactionDescription description, DateTime date)
     {

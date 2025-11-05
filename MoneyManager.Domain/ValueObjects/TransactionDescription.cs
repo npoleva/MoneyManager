@@ -3,6 +3,8 @@ namespace MoneyManager.Domain.ValueObjects;
 public record TransactionDescription
 {
     public string Value { get; }
+    
+    protected TransactionDescription() { }
 
     public TransactionDescription(string value)
     {

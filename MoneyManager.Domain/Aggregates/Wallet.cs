@@ -5,11 +5,13 @@ namespace MoneyManager.Domain.Aggregates;
 
 public class Wallet
     {
-        public Guid Id { get; }
-        public string Name { get; }
-        public Money InitialBalance { get; }
+        public Guid Id { get; private set; }
+        public string Name { get; private set; } = null!;
+        public Money InitialBalance { get; private set; } = null!;
 
         private readonly List<Transaction> _transactions = new();
+        
+        protected Wallet() { }
 
         public Wallet(string name, Money initialBalance)
         {
