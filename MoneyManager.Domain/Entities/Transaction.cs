@@ -20,5 +20,4 @@ public class Transaction
         Description = description;
         Date = date;
     }
-    private Transaction() { }
 }
